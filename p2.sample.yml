@@ -1,0 +1,67 @@
+#P2 expects a root name for the config - this enables you to have multiple
+#separate configurations inside a single YML file - you specify the root name
+#on the command line, it's arbitrary.
+blackfriars:
+  repo_path: "/gittest"                       #the path to the repo (absolute path recommended)
+  git_author:                                 #the author to specify for git commits and annotated tags
+    email: "newworldorder@example.com"
+    name: "Templi Orientis"
+  revfmt: 'r%d'                               #sprintf format to use for tags - this example produces SVN style tags
+  defuser: 'root'                             #default username for SSH if none is specified for a particular host
+  defdirkey: 'hostname'                       #default YAML key to use for each host's config dir
+  ssh_keys:                                   #array of SSH keys to attempt authentication with (must be OpenSSH format)
+    - 'C:\\Users\\SomeUser\\.ssh\\id_rsa'     #Windows style
+    - '/home/someuser/.ssh/id_rsa'            #POSIX style
+  ssh_config: &ssh_config                     #example of a "global" SSH fetch list that we append to each host
+    dir/hello.txt:                            #path to save the command result to within the repo
+      cmd: 'echo hello'                       #command to execute on the remote machine
+    bye.txt: 'echo bye'
+  rsyncpath: 'C:\\cygwin\\bin\\rsync.exe'     #if rsync is not in the system PATH, specify it here
+  cygwin: true                                #if you are using cygwin's rsync, set this to true
+
+  filter_config: &filter_config               #another "global" config symbol
+    iptables:                                 #path to output file within the host folder
+
+    #this example calls the Ruby gsub method on the string to remove comments and zero the counters
+      - ['gsub', !ruby/regexp '/^#.*(\n|\r\n|\r)/', '']
+      - ['gsub', !ruby/regexp '/\[[0-9]+:[0-9]+\]/', '[0:0]']
+
+  rsync_config: &rsync_config                 #example of a "global" rsync fetch list that we append to each host
+    keepalived:                               #key name determines the folder to save into
+      dir: '/etc/keepalived'                  #folder on the remote host to copy
+      exclude: ['*.swp', 'samples']           #array of excluded files
+
+  hosts:                                      #array of hosts we want to fetch data for
+    -
+      hostname: 'somehost.example.com'        #hostname to connect to, used by defdirkey in this example
+      dir: 'somehost'                         #(optional) overrides defdir key to store all configs in a folder name of your choice
+      ssh:                                    #ssh commands, the key is the filename to store as, the value is the actual ssh command to run
+        stupidlist:
+          cmd: 'ls -alh /root'
+        anotherlist:
+          cmd: 'ls /usr'
+        <<: *ssh_config                       #neat YAML trick to push a pre-existing array into this one
+
+      rsync:                                  #array of directories to rsync
+        quagga:
+          dir: '/etc/quagga'
+          exclude: [ '*.swp', '*.save' ]
+        <<: *rsync_config                     #neat YAML trick to push a pre-existing array into this one
+
+      filter:
+        - ['reverse']                         #calls the ruby reverse method on the string
+        <<: *filter_config                    #neat YAML trick to push a pre-existing array into this one
+    -
+      hostname: '[2001:db8::]'
+      dir: 'core-cisco-router'
+      ssh:
+        iproute:
+          cmd: 'ip rou'
+        iptables:
+          cmd: 'iptables -vnL'
+        <<: *ssh_config
+      rsync:
+        quagga:
+          dir: '/etc/quagga'
+          exclude: [ '*.swp', '*.save' ]
+        <<: *rsync_config
