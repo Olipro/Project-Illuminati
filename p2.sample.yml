@@ -35,11 +35,11 @@ blackfriars:
     -
       hostname: 'somehost.example.com'        #hostname to connect to, used by defdirkey in this example
       dir: 'somehost'                         #(optional) overrides defdir key to store all configs in a folder name of your choice
-      ssh:                                    #ssh commands, the key is the filename to store as, the value is the actual ssh command to run
-        stupidlist:
-          cmd: 'ls -alh /root'
-        anotherlist:
-          cmd: 'ls /usr'
+      ssh:
+        iproute:
+          cmd: 'ip rou'
+        iptables:
+          cmd: 'iptables -vnL'
         <<: *ssh_config                       #neat YAML trick to push a pre-existing array into this one
 
       rsync:                                  #array of directories to rsync
@@ -55,13 +55,10 @@ blackfriars:
       hostname: '[2001:db8::]'
       dir: 'core-cisco-router'
       ssh:
-        iproute:
-          cmd: 'ip rou'
-        iptables:
-          cmd: 'iptables -vnL'
+        show-run:
+          cmd: 'sh run'
+        live-routes/bgp-routes:
+          cmd: 'sh ip route bgp'
+        live-routes/ospf-routes:
+          cmd: 'sh ip route ospf'
         <<: *ssh_config
-      rsync:
-        quagga:
-          dir: '/etc/quagga'
-          exclude: [ '*.swp', '*.save' ]
-        <<: *rsync_config
