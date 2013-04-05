@@ -37,7 +37,7 @@ class Illuminati
     @add_mutex.synchronize {
       ret = @treebuilders[(name.to_sym rescue name)]
       if ret.nil?
-        tree = !tree.nil? && tree.include?(name) ? @repo.lookup(tree[name][:oid]) : nil
+        tree = !tree.nil? && !tree[name].nil? ? @repo.lookup(tree[name][:oid]) : tree = nil
         ret = @treebuilders[(name.to_sym rescue name)] = {
           :builder => tree.nil? ? Rugged::Tree::Builder.new : Rugged::Tree::Builder.new(tree),
           :tree => tree
