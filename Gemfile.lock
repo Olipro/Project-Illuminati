@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/libgit2/rugged.git
-  revision: f041f7fe2ad5ad30242c165b359ab1dff03f9b63
+  revision: 2a141313c8369cef8bf02c1961f30a383b028e1f
   branch: development
   submodules: true
   specs:
@@ -9,7 +9,7 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    net-ssh (2.6.3)
+    net-ssh (2.6.6)
     trollop (2.0)
 
 PLATFORMS
