@@ -16,9 +16,12 @@ class Propagandadue < Illuminati
 
   def ssh_worker(host, hostid)
     host[:user] = @p2_cfg[:defuser] if host[:user].nil?
+    sshargs = {}
+    sshargs.merge! ({ :keys => @p2_cfg[:ssh_keys] })
+    sshargs.merge! ({ :password => host[:password] }) if host.has_key?(:password)
     data = run_sshcmds( host[:hostname], host[:user],
                         {
-                            :sshargs => { :keys => @p2_cfg[:ssh_keys] },
+                            :sshargs => sshargs,
                             :cmds => host[:ssh]
                         })
     host[:dir] = host[(@p2_cfg[:defdirkey].to_sym rescue @p2_cfg[:defdirkey])] if host[:dir].nil?
@@ -42,8 +45,8 @@ class Propagandadue < Illuminati
     cmds = @p2_cfg[:hosts].each do |host|
       @hosts_tree << host.merge({ :files => {} })
       len = @hosts_tree.length-1
-      workers << Thread.new {ssh_worker(host, len)} unless dostuff.include?(:no_ssh)
-      workers << Thread.new {rsync_worker(host, len)} unless dostuff.include?(:no_rsync)
+      workers << Thread.new {ssh_worker(host, len)} unless (dostuff.include?(:no_ssh) || !host.has_key?(:ssh))
+      workers << Thread.new {rsync_worker(host, len)} unless (dostuff.include?(:no_rsync) || !host.has_key?(:rsync))
     end
     workers.each { |worker| worker.join }
     changed = false
