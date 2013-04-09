@@ -16,9 +16,11 @@ class Propagandadue < Illuminati
 
   def ssh_worker(host, hostid)
     host[:user] = @p2_cfg[:defuser] if host[:user].nil?
+    host[:bindto] = @p2_cfg[:bindto] if (host[:bindto].nil? && !@p2_cfg[:bindto].nil?)
     sshargs = {}
     sshargs.merge! ({ :keys => @p2_cfg[:ssh_keys] })
     sshargs.merge! ({ :password => host[:password] }) if host.has_key?(:password)
+    sshargs.merge! ({ :bind_address => host[:bindto] }) if host.has_key?(:bindto)
     data = run_sshcmds( host[:hostname], host[:user],
                         {
                             :sshargs => sshargs,
