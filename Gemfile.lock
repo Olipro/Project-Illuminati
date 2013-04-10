@@ -1,4 +1,11 @@
 GIT
+  remote: git://github.com/Olipro/net-ssh.git
+  revision: c2157d51b169b23bf13560a4a2dc3c96c3f1deb6
+  branch: unsigned
+  specs:
+    net-ssh (2.6.7)
+
+GIT
   remote: git://github.com/libgit2/rugged.git
   revision: 2a141313c8369cef8bf02c1961f30a383b028e1f
   branch: development
@@ -9,13 +16,13 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
-    net-ssh (2.6.6)
     trollop (2.0)
 
 PLATFORMS
+  ruby
   x86-mingw32
 
 DEPENDENCIES
-  net-ssh (~> 2.6.3)
+  net-ssh!
   rugged!
   trollop (~> 2.0)

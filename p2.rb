@@ -21,6 +21,8 @@ class Propagandadue < Illuminati
     sshargs.merge! ({ :keys => @p2_cfg[:ssh_keys] })
     sshargs.merge! ({ :password => host[:password] }) if host.has_key?(:password)
     sshargs.merge! ({ :bind_address => host[:bindto] }) if host.has_key?(:bindto)
+    sshargs.merge! ({ :max_win_size => host[:max_win_size] }) if host.has_key?(:max_win_size)
+    sshargs.merge! ({ :max_pkt_size => host[:max_pkt_size] }) if host.has_key?(:max_pkt_size)
     data = run_sshcmds( host[:hostname], host[:user],
                         {
                             :sshargs => sshargs,

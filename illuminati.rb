@@ -169,11 +169,16 @@ class Illuminati
       ch.exec(cmd) do |ch, success|
         break unless success
         result = ""
-        ch.on_data do |ch, data|
+      ch.on_data do |ch, data|
+	        cmdarr[idx] =  "" unless result != ""
           result += data
-        end
-        ch.on_eof { cmdarr[idx] = result }
-        end
+	        cmdarr[idx] += data
+      end
+      ch.on_eof { cmdarr[idx] = result }
+      end
+    end
+    channel.on_open_failed do |ch, code, desc|
+      puts ssh.host + " Channel open failed!\n"
     end
   end
 
@@ -184,7 +189,7 @@ class Illuminati
       retcmds.each_pair do |file, cmd|
         channels.push(channelexec(ssh, retcmds, file))
       end
-      ssh.loop
+      ssh.loop rescue puts ssh.host + " disconnected prematurely\n"
       return retcmds
     end
     return nil
