@@ -165,7 +165,7 @@ class Illuminati
     return true
   end
 
-  def channelexec(ssh, cmdarr, idx)
+  def channelexec(ssh, cmdarr, idx, depth = 0)
     cmd = cmdarr[idx][:cmd]
     channel = ssh.open_channel do |ch|
       ch.exec(cmd) do |ch, success|
@@ -180,7 +180,8 @@ class Illuminati
       end
     end
     channel.on_open_failed do |ch, code, desc|
-      puts ssh.host + " Channel open failed!\n"
+      sleep(0.1) ; channelexec(ssh, cmdarr, idx, depth+1) if code == 1 && depth < 20
+      puts ssh.host + " #{code} #{desc} - Channel open failed!\n" unless code == 1 && depth < 20
     end
   end
 
