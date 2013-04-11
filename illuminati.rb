@@ -37,7 +37,7 @@ class Illuminati
     @add_mutex.synchronize {
       ret = @treebuilders[(name.to_sym rescue name)]
       if ret.nil?
-        tree = !tree.nil? && !tree[name].nil? ? @repo.lookup(tree[name][:oid]) : tree = nil
+        tree = (!tree.nil? && !tree[name].nil? ? @repo.lookup(tree[name][:oid]) : nil)
         ret = @treebuilders[(name.to_sym rescue name)] = {
           :builder => tree.nil? ? Rugged::Tree::Builder.new : Rugged::Tree::Builder.new(tree),
           :tree => tree
@@ -79,6 +79,7 @@ class Illuminati
   end
 
   def git_add_to_tree(name, data, newtree, tree = @tree, filemode = 0100644, override_empty = false)
+    return nil if data.nil? || data.to_s.length == 0
     if !override_empty && !tree.nil? then
       obj = tree.get_entry_by_oid(Rugged::Repository.hash(data, :blob))
       return nil if !obj.nil? && obj[:name] == name
