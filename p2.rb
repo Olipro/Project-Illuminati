@@ -33,7 +33,9 @@ class Propagandadue < Illuminati
   end
 
   def rsync_worker(host, hostid)
-    checkout = git_find_tree(hostid, @tree)
+    #TODO: implement git_recurse_tree to checkout existing repo files
+    #checkout = git_find_tree(, @tree, '/'+host[:hostname])
+    checkout = {:tree => false} #DELETEME
     workerfiles = {}
     Dir.mktmpdir { |dir|
       git_checkout_tree(dir, checkout[:tree]) if checkout[:tree]

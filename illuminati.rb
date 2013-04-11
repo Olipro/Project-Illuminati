@@ -31,14 +31,15 @@ class Illuminati
     return @repo
   end
 
-  def git_find_tree(name, tree)
-    ret = @treebuilders[(name.to_sym rescue name)]
+  def git_find_tree(name, tree, treepath)
+    uniqueid = ((name+'/'+treepath).to_sym rescue (name+'/'+treepath))
+    ret = @treebuilders[uniqueid]
     return ret unless ret.nil?
     @add_mutex.synchronize {
-      ret = @treebuilders[(name.to_sym rescue name)]
+      ret = @treebuilders[uniqueid]
       if ret.nil?
         tree = (!tree.nil? && !tree[name].nil? ? @repo.lookup(tree[name][:oid]) : nil)
-        ret = @treebuilders[(name.to_sym rescue name)] = {
+        ret = @treebuilders[uniqueid] = {
           :builder => tree.nil? ? Rugged::Tree::Builder.new : Rugged::Tree::Builder.new(tree),
           :tree => tree
         }
@@ -47,13 +48,13 @@ class Illuminati
     return ret
   end
 
-  def git_add_to_repo(path, data, newtree, tree = @tree, filemode = 0100644, override_empty = false)
+  def git_add_to_repo(path, data, newtree, tree = @tree, filemode = 0100644, override_empty = false, parent = "")
     node = path.sub("\\", "/").split("/", 2)
     if node.count == 1
         return git_add_to_tree(node[0], data, newtree, tree, filemode, override_empty)
     else
-      tb = git_find_tree(node[0], tree)
-      objtree = git_add_to_repo(node[1], data, tb[:builder], tb[:tree], filemode, override_empty)
+      tb = git_find_tree(node[0], tree, parent)
+      objtree = git_add_to_repo(node[1], data, tb[:builder], tb[:tree], filemode, override_empty, parent+'/'+node[0])
       return newtree if objtree.nil?
       Thread.current[:threadsrunning] = false
       @wri_mutex.synchronize {
