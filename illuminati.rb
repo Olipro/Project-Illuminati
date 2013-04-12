@@ -124,8 +124,8 @@ class Illuminati
       :update_ref => updateref
     }
     @tree = @repo.lookup(options[:tree])
-    return Rugged::Commit.create(@repo, options)
     @treechanged = false
+    return Rugged::Commit.create(@repo, options)
   end
 
   def git_tag(name, target, message=nil, tagger=@author.merge(:time => Time.now))
