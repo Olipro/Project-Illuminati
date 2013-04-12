@@ -2,6 +2,9 @@
 
 * support for fetching configuration via telnet
 * support pushing to remote repositories
-* full exception catching and handling
+* better exception catching and handling
 * verbose output option
+* Thread queueing for executing commands on channels.
+* Checkout existing tree for rsync (improved performance)
 * FRICKIN LAZERBEAMS
+
