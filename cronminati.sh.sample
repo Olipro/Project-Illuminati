@@ -1,0 +1,19 @@
+#/bin/zsh
+#
+#This is an example script for use in a cron job.
+#Its purpose is to run illumminati and then push
+#the code up to a remote git repository.
+#
+#Remember that Illuminati does not touch the working tree
+#should you wish to peruse the contents on the local machine
+#you should first change to the directory of the repo and run
+#the following command: "git reset --hard HEAD"
+#
+#This script takes a single argument, which is the name of the config
+#section in the YML to execute
+
+cd /root/project-illuminati #change directory to wherever the code is
+bundle exec ruby nwo.rb -f p2.yml -n $1
+cd $1
+git remote add origin "git@gitlab.example.com:path/to/illuminati-$1.git"
+git push origin master #you may or may not want to make this force a push

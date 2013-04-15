@@ -194,7 +194,7 @@ class Illuminati
       end
       ssh.loop rescue puts ssh.host + " disconnected prematurely\n"
       return retcmds
-    end
+    end rescue puts host + " - connection failure\n"
     return nil
   end
 

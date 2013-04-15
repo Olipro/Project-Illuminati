@@ -29,7 +29,7 @@ class Propagandadue < Illuminati
                             :cmds => host[:ssh]
                         })
     host[:dir] = host[(@p2_cfg[:defdirkey].to_sym rescue @p2_cfg[:defdirkey])] if host[:dir].nil?
-    @hosts_tree[hostid][:files].merge!(data)
+    @hosts_tree[hostid][:files].merge!(data) unless data.nil?
   end
 
   def rsync_worker(host, hostid)
