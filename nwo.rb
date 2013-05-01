@@ -1,5 +1,5 @@
-require './p2'
-require 'trollop'
+require_relative 'env'
+require 'illuminati'
 
 opts = Trollop::options do
   opt :cfgfile, "Specifies the YAML config file to use", :type => :string, :short => 'f'
