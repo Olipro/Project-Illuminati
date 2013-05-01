@@ -1,16 +1,9 @@
-require 'yaml'
-require 'tmpdir'
-require 'scanf'
-require './illuminati'
-
 class Propagandadue < Illuminati
 
   def initialize(opts)
     @p2_cfg = YAML.load_file(opts[:cfgfile])[opts[:cfgname]].symbolize_keys
-    @opts = opts
-    git_open_repo(@p2_cfg[:repo_path])
     @author = { :name => @p2_cfg[:git_author][:name], :email => @p2_cfg[:git_author][:email] }
-    @tree_mutex = Mutex.new
+    @opts = opts
     @hosts_tree = []
   end
 
@@ -55,15 +48,29 @@ class Propagandadue < Illuminati
       workers << Thread.new {rsync_worker(host, len)} unless (dostuff.include?(:no_rsync) || !host.has_key?(:rsync))
     end
     workers.each { |worker| worker.join }
+
     changed = false
+
+    repo = Rugged::Repository.new(@p2_cfg[:repo_path]) rescue Rugged::Repository.init_at(@p2_cfg[:repo_path], false)
+
     @hosts_tree.each do |host|
+      commit = Commit.new(repo)
+
       host[:filter].each { |key, val|
         val.each { |arr| host[:files][key] = host[:files][key].send(*arr) } unless host[:files][key].nil?
       } if host[:filter].is_a? Hash
-      changed |= git_write_files(host[:files], host[:hostname] + " " + Time.now.strftime("%Y-%m-%d %H:%M:%S"), host[:dir].nil? ? host[:hostname] : host[:dir], false, @p2_cfg[:git_author])
+
+      commit.add_files(host[:files], (host[:dir].nil? ? host[:hostname] : host[:dir]) + '/')
+      commit.message = host[:hostname] + ' ' + Time.now.strftime("%Y-%m-%d %H:%M:%S")
+      commit.author = commit.committer = @p2_cfg[:git_author].merge( { :time => Time.now } )
+      commit.parents = nil
+      commit.update_ref = 'HEAD'
+      commit.write unless commit.empty?
+
+      changed |= !commit.empty?
     end
-    git_update_rev(@p2_cfg[:revfmt]) if changed
-    puts "Nothing to do." unless changed && !@opts[:quiet]
+    git_update_rev(@p2_cfg[:revfmt], repo) if changed
+    puts 'Nothing to do.' unless changed && !@opts[:quiet]
   end
 
 end

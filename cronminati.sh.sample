@@ -16,4 +16,4 @@ cd /root/project-illuminati #change directory to wherever the code is
 bundle exec ruby nwo.rb -f p2.yml -n $1
 cd $1
 git remote add origin "git@gitlab.example.com:path/to/illuminati-$1.git"
-git push origin master #you may or may not want to make this force a push
+git push --tags origin master #you may or may not want to make this force a push
