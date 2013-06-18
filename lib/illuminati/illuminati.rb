@@ -1,9 +1,7 @@
 class Illuminati
 
-  def git_write_blob(path, childobj)
-    f = File.open(path, 'w')
-    f.write(childobj.read_raw.data)
-    f.close
+  def git_write_blob(path, blob)
+    File.open(path, 'w+') {|f| f.write(blob.read_raw.data) }
   end
 
   def git_checkout_tree(path, tree = @tree)
@@ -21,8 +19,19 @@ class Illuminati
     workers.each { |worker| worker.join }
   end
 
-  def git_update_rev(format, repo, message = Time.now.strftime('%Y-%m-%d %H:%M:%S'))
-    rev = @head_tag.name.scanf('refs/tags/'+format)[0]+1 rescue 1
+  def git_find_tag(target, repo)
+    workers = []
+    tag = nil
+    repo.refs('refs/tags/*').each do |t|
+      break if tag
+      workers << Thread.new { tag = t if repo.lookup(t.target).target == target }
+    end
+    workers.each { |w| w.join } unless tag
+    tag
+  end
+
+  def git_update_rev(format, repo, tag, message = Time.now.strftime('%Y-%m-%d %H:%M:%S'))
+    rev = git_find_tag(tag, repo).name.scanf('refs/tags/'+format)[0]+1 rescue 1
     Rugged::Tag.create(repo, {
         :name => sprintf(format, rev),
         :target => repo.head.target,
@@ -30,40 +39,34 @@ class Illuminati
         :tagger => @p2_cfg[:git_author].merge(:time => Time.now) })
   end
 
-  def channelexec(ssh, cmdarr, idx, depth = 0)
+  def channelexec(ssh, cmdarr, idx, q)
     cmd = cmdarr[idx][:cmd]
+
     channel = ssh.open_channel do |ch|
       ch.exec(cmd) do |ch, success|
         break unless success
-        result = ''
-      ch.on_data do |ch, data|
-	        cmdarr[idx] = '' unless result != ''
-          result += data
-	        cmdarr[idx] += data
-      end
-      ch.on_eof { cmdarr[idx] = result }
+        cmdarr[idx] = ''
+        ch.on_data { |ch, data| cmdarr[idx] += data }
       end
     end
+
     channel.on_open_failed do |ch, code, desc|
-      sleep(0.1) ; channelexec(
-                               ssh,
-			       cmdarr,
-			       idx,
-			       depth+1
-			      ) if code == 1 && depth < 20
-      puts ssh.host + " #{code} #{desc} - Channel open failed!\n" unless code == 1 && depth < 20
+      q << [ssh, cmdarr, idx] if code == 1
+      puts ssh.host + " #{code} #{desc} - Channel open failed!\n" unless code == 1
     end
+    channel
+
   end
 
   def run_sshcmds(host, user, optargs={})
     Net::SSH.start(host, user, optargs[:sshargs]) do |ssh|
-      channels = []
       retcmds = optargs[:cmds]
-      retcmds.each_pair {|file, _| channels.push(channelexec(ssh, retcmds, file)) }
-      ssh.loop rescue puts ssh.host + " disconnected prematurely\n"
+      q = []
+      retcmds.each {|file, _| q << [ssh, retcmds, file] }
+      ssh.loop { ssh.busy? || q.empty? ? ssh.busy? : q.count.times { channelexec(*q.pop, q) } }
       return retcmds
     end rescue puts host + " - connection failure\n"
-    return nil
+    nil
   end
 
   def run_rsync(host, user, cmds, tmpdir, cygwin=false)

@@ -1,15 +1,37 @@
 GIT
-  remote: git://github.com/libgit2/rugged.git
-  revision: c1c37b01e4ba9a3be6c9e32edce9d6522ac298e4
-  branch: development
+  remote: git://github.com/Olipro/rugged.git
+  revision: 06bd53867f22c7c5f9c06c89e44971610e2a8604
+  branch: gemspec-fix
   submodules: true
   specs:
-    rugged (0.17.0.b8)
+    rugged (0.18.0.b1)
 
 GEM
   remote: https://rubygems.org/
   specs:
+    colorize (0.5.8)
+    diff-lcs (1.2.4)
+    gherkin-ruby (0.3.0)
+    json (1.8.0)
+    multi_json (1.7.7)
     net-ssh (2.6.7)
+    rdoc (4.0.1)
+      json (~> 1.4)
+    rspec (2.13.0)
+      rspec-core (~> 2.13.0)
+      rspec-expectations (~> 2.13.0)
+      rspec-mocks (~> 2.13.0)
+    rspec-core (2.13.1)
+    rspec-expectations (2.13.0)
+      diff-lcs (>= 1.1.3, < 2.0)
+    rspec-mocks (2.13.1)
+    simplecov (0.7.1)
+      multi_json (~> 1.0)
+      simplecov-html (~> 0.7.1)
+    simplecov-html (0.7.1)
+    spinach (0.8.3)
+      colorize (= 0.5.8)
+      gherkin-ruby (~> 0.3.0)
     trollop (2.0)
 
 PLATFORMS
@@ -18,5 +40,9 @@ PLATFORMS
 
 DEPENDENCIES
   net-ssh (~> 2.6.7)
+  rdoc (~> 4.0.1)
+  rspec (~> 2.13.0)
   rugged!
+  simplecov (~> 0.7.1)
+  spinach (~> 0.8.2)
   trollop (~> 2.0)

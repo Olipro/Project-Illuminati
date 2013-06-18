@@ -67,8 +67,8 @@ class Commit
     filename = node[2]
 
     unless override_empty || tp[:tree].nil?
-      obj = tp[:tree].get_entry_by_oid(Rugged::Repository.hash(data, :blob))
-      return nil if !obj.nil? && obj[:name] == filename
+      obj = tp[:tree][filename]
+      return nil if !obj.nil? && obj[:oid] == Rugged::Repository.hash(data, :blob)
     end
     @empty = false
     tp[:builder] << {:name => filename, :oid => @repo.write(data, :blob), :filemode => filemode, :type => :blob}

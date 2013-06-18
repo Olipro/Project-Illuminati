@@ -10,17 +10,17 @@ class Propagandadue < Illuminati
   def ssh_worker(host, hostid)
     host[:user] = @p2_cfg[:defuser] if host[:user].nil?
     host[:bindto] = @p2_cfg[:bindto] if (host[:bindto].nil? && !@p2_cfg[:bindto].nil?)
-    sshargs = {}
-    sshargs.merge! ({ :keys => @p2_cfg[:ssh_keys] })
-    sshargs.merge! ({ :password => host[:password] }) if host.has_key?(:password)
-    sshargs.merge! ({ :bind_address => host[:bindto] }) if host.has_key?(:bindto)
-    sshargs.merge! ({ :max_win_size => host[:max_win_size] }) if host.has_key?(:max_win_size)
-    sshargs.merge! ({ :max_pkt_size => host[:max_pkt_size] }) if host.has_key?(:max_pkt_size)
-    data = run_sshcmds( host[:hostname], host[:user],
-                        {
-                            :sshargs => sshargs,
-                            :cmds => host[:ssh]
-                        })
+    sshargs = {:keys => @p2_cfg[:ssh_keys]}
+    host.each { |key, val|
+      case key
+        when :hostname
+        when :ssh
+        when :user
+        when :bindto ; sshargs[:bind_address] = val
+        else sshargs[key] = val
+      end
+    }
+    data = run_sshcmds(host[:hostname], host[:user], {:sshargs => sshargs, :cmds => host[:ssh]} )
     host[:dir] = host[(@p2_cfg[:defdirkey].to_sym rescue @p2_cfg[:defdirkey])] if host[:dir].nil?
     @hosts_tree[hostid][:files].merge!(data) unless data.nil?
   end
@@ -52,6 +52,7 @@ class Propagandadue < Illuminati
     changed = false
 
     repo = Rugged::Repository.new(@p2_cfg[:repo_path]) rescue Rugged::Repository.init_at(@p2_cfg[:repo_path], false)
+    tag = repo.lookup(repo.head.target)
 
     @hosts_tree.each do |host|
       commit = Commit.new(repo)
@@ -69,7 +70,7 @@ class Propagandadue < Illuminati
 
       changed |= !commit.empty?
     end
-    git_update_rev(@p2_cfg[:revfmt], repo) if changed
+    git_update_rev(@p2_cfg[:revfmt], repo, tag) if changed
     puts 'Nothing to do.' unless changed && !@opts[:quiet]
   end
 
