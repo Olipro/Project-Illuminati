@@ -17,7 +17,7 @@ class Propagandadue < Illuminati
         when :ssh
         when :user
         when :bindto ; sshargs[:bind_address] = val
-        else sshargs[key] = val
+        else sshargs[key] = val if Net::SSH::VALID_OPTIONS.include? key
       end
     }
     data = run_sshcmds(host[:hostname], host[:user], {:sshargs => sshargs, :cmds => host[:ssh]} )
