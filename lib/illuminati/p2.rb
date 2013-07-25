@@ -13,9 +13,6 @@ class Propagandadue < Illuminati
     sshargs = {:keys => @p2_cfg[:ssh_keys]}
     host.each { |key, val|
       case key
-        when :hostname
-        when :ssh
-        when :user
         when :bindto ; sshargs[:bind_address] = val
         else sshargs[key] = val if Net::SSH::VALID_OPTIONS.include? key
       end

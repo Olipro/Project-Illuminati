@@ -14,7 +14,7 @@ GEM
     gherkin-ruby (0.3.0)
     json (1.8.0)
     multi_json (1.7.7)
-    net-ssh (2.6.7)
+    net-ssh (2.6.8)
     rdoc (4.0.1)
       json (~> 1.4)
     rspec (2.13.0)
@@ -29,7 +29,7 @@ GEM
       multi_json (~> 1.0)
       simplecov-html (~> 0.7.1)
     simplecov-html (0.7.1)
-    spinach (0.8.3)
+    spinach (0.8.4)
       colorize (= 0.5.8)
       gherkin-ruby (~> 0.3.0)
     trollop (2.0)
@@ -39,10 +39,10 @@ PLATFORMS
   x86-mingw32
 
 DEPENDENCIES
-  net-ssh (~> 2.6.7)
+  net-ssh (~> 2.6.8)
   rdoc (~> 4.0.1)
   rspec (~> 2.13.0)
   rugged!
   simplecov (~> 0.7.1)
-  spinach (~> 0.8.2)
+  spinach (~> 0.8.4)
   trollop (~> 2.0)

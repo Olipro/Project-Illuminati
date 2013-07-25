@@ -1,4 +1,4 @@
-# Project Illuminati v0.4.1 - Welcome to the New World Order
+# Project Illuminati v0.4.2 - Welcome to the New World Order
 
 Project Illuminati is an absurdly multithreaded application designed for fast and flexible versioning of on-disk and live system configurations.
 

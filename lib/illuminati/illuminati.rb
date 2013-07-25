@@ -63,7 +63,9 @@ class Illuminati
       retcmds = optargs[:cmds]
       q = []
       retcmds.each {|file, _| q << [ssh, retcmds, file] }
-      ssh.loop { ssh.busy? || q.empty? ? ssh.busy? : q.count.times { channelexec(*q.pop, q) } }
+      ssh.loop do
+        ssh.busy? || q.empty? ? ssh.busy? : q.count.times { channelexec(*q.pop, q) }
+      end rescue puts host + " - premature channel close\n"
       return retcmds
     end rescue puts host + " - connection failure\n"
     nil
