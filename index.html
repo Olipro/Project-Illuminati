@@ -1,0 +1,90 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Project Illuminati by Olipro</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/Olipro/Project-Illuminati">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/Olipro/Project-Illuminati/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/Olipro/Project-Illuminati/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Project Illuminati</h1>
+          <p>Welcome to the New World Order</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/Olipro">Olipro</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <p>Project Illuminati is an absurdly multithreaded application designed for fast and flexible versioning of on-disk and live system configurations. It's suitable for versioning any device that runs an SSHd. Rsync is supported too (via the command line).</p>
+
+<p>Backed by a Git repository, it provides a fast and easy means of comparing and maintaining configuration changes on your routers, switches, Linux, BSD boxen and whatever else! Illuminati was designed to be completly agnostic of what it's versioning, you simply tell it what command(s) it should execute on the remote host and it'll do them, grab the result and commit it. You can also have Illuminati create a git tag at the end of processing so that you can see what's changed between runs.</p>
+
+<p>Illuminati also supports running output through a filter before committing it, so if you're versioning something that can get arbitrarily reordered on the host, you can invoke any Ruby functions you like to mutate it, you can even temporarily convert it to other datatypes (like an array, for example) but you must ensure that the final operation will make it a string. There's an example of this in the sample config that does a cleanup of iptables-save.</p>
+
+<p>We highly recommend uploading your configuration files into a GitLab repository for beautiful web-based diffs, but if you prefer the Git commandline, that's cool too. RANCID is Rancid.</p>
+
+<h2>
+<a name="requirements" class="anchor" href="#requirements"><span class="octicon octicon-link"></span></a>Requirements</h2>
+
+<ul>
+<li>Ruby 1.9.3+</li>
+<li>Ruby Bundler</li>
+<li>Devkit (Only applicable to Windows)</li>
+</ul><h3>
+<a name="optional-extras" class="anchor" href="#optional-extras"><span class="octicon octicon-link"></span></a>Optional Extras</h3>
+
+<ul>
+<li>rsync (command-line executable - Cygwin recommended for Windows)</li>
+<li>ssh (command-line executable - only necessary for rsync over SSH)</li>
+</ul><h2>
+<a name="configuration" class="anchor" href="#configuration"><span class="octicon octicon-link"></span></a>Configuration</h2>
+
+<p>Open <code>p2.sample.yml</code> in your favorite YAML editor (that's Notepad++, right?) for documentation on the configuration file.</p>
+
+<p>The key points to take away from the example config is that you must have a root-level key for Illuminati to use. This is so that you can, if you wish, store multiple repository configs in a single file since the root-level key is considered to be an individual git repo.</p>
+
+<p>Illuminati itself only cares about the hosts array and the defaults, the additional fluff exists in the example as a means of demonstrating how you can leverage the capabilities of YAML to avoid repeating yourself.</p>
+
+<h2>
+<a name="running-illuminati" class="anchor" href="#running-illuminati"><span class="octicon octicon-link"></span></a>Running Illuminati</h2>
+
+<pre><code>bundle install --deployment
+bundle exec ruby p2.rb -f [configuration file] -n [YAML root section name]
+</code></pre>
+
+<h2>
+<a name="caveats" class="anchor" href="#caveats"><span class="octicon octicon-link"></span></a>Caveats</h2>
+
+<p>Currently, there is a potential race condition with SSH hosts that rudely close the channel, resulting in only a partial capture of data. this typically only applies to older Cisco devices that you've configured with an autocommand.</p>
+
+<p>Rsync is also not optimised right now and each rsync job will fetch into an empty temp dir rather than checking out from the current version and then letting rsync do all it's delta work, so bear this in mind if you intend to do versioning of something very large.</p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
