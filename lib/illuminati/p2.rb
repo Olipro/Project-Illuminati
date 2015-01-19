@@ -49,7 +49,7 @@ class Propagandadue < Illuminati
     changed = false
 
     repo = Rugged::Repository.new(@p2_cfg[:repo_path]) rescue Rugged::Repository.init_at(@p2_cfg[:repo_path], false)
-    tag = repo.lookup(repo.head.target)
+    tag = repo.lookup(repo.head.target) rescue nil
 
     @hosts_tree.each do |host|
       commit = Commit.new(repo)
